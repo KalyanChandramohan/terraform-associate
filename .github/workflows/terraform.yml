@@ -4,11 +4,13 @@ on:
   push:
     branches: [main]
     paths:
+      - "user_management/**"
       - "ec2/**"
       - ".github/workflows/terraform.yml"
   pull_request:
     branches: [main]
     paths:
+      - "user_management/**"
       - "ec2/**"
       - ".github/workflows/terraform.yml"
 
@@ -21,15 +23,18 @@ permissions:
 env:
   TF_VERSION: "1.9.5"
   AWS_REGION: "ap-south-1"
-  WORKING_DIR: "ec2"
 
 jobs:
   terraform:
-    name: Validate & Plan
+    name: Validate & Plan (${{ matrix.dir }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: [user_management, ec2]
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ matrix.dir }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,15 +64,19 @@ jobs:
         run: terraform plan -input=false -no-color
 
   apply:
-    name: Apply
+    name: Apply (${{ matrix.dir }})
     needs: terraform
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: [user_management, ec2]
     # Optional: require manual approval by protecting this environment in repo settings
     environment: production
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ matrix.dir }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
