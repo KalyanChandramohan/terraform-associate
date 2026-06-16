@@ -4,13 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - "user_management/**"
+      #- "user_management/**"
       - "ec2/**"
       - ".github/workflows/terraform.yml"
   pull_request:
     branches: [main]
     paths:
-      - "user_management/**"
+      #- "user_management/**"
       - "ec2/**"
       - ".github/workflows/terraform.yml"
 
@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dir: [user_management, ec2]
+        dir: [ec2]
     defaults:
       run:
         working-directory: ${{ matrix.dir }}
@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dir: [user_management, ec2]
+        dir: [ec2]
     # Optional: require manual approval by protecting this environment in repo settings
     environment: production
     defaults:
