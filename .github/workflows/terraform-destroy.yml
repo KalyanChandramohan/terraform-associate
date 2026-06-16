@@ -1,0 +1,62 @@
+name: Terraform Destroy
+
+# Manual only — never runs on push/PR. Trigger from the Actions tab via
+# "Run workflow".
+on:
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: "Which Terraform root to destroy"
+        required: true
+        type: choice
+        options:
+          - ec2
+          - user_management
+      confirm:
+        description: 'Type "destroy" to confirm'
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VERSION: "1.9.5"
+  AWS_REGION: "ap-south-1"
+
+jobs:
+  destroy:
+    name: Destroy (${{ inputs.directory }})
+    runs-on: ubuntu-latest
+    # Gate behind the protected environment so it can require manual approval.
+    environment: production
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+    steps:
+      - name: Validate confirmation
+        if: ${{ inputs.confirm != 'destroy' }}
+        run: |
+          echo "::error::Confirmation text did not match 'destroy'. Aborting."
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Destroy
+        run: terraform destroy -input=false -auto-approve
