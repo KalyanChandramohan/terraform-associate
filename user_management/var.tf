@@ -4,3 +4,8 @@ variable "user_name" {
   default     = "terraform_admin"
 
 }
+
+variable "github_repository" {
+  description = "GitHub repo allowed to assume the OIDC role, as \"owner/repo\"."
+  type        = string
+}
