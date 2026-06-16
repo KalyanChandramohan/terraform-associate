@@ -11,7 +11,7 @@ on:
         type: choice
         options:
           - ec2
-          - user_management
+          # - user_management
       confirm:
         description: 'Type "destroy" to confirm'
         required: true

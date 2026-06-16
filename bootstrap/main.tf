@@ -2,16 +2,6 @@
 # backend for the other roots. This root itself uses LOCAL state by design —
 # you can't store its state in a bucket that doesn't exist yet. Apply it once.
 
-terraform {
-  required_version = ">= 1.5.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
 provider "aws" {
   region = var.region
 }
