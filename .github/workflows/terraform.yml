@@ -13,6 +13,8 @@ on:
       #- "user_management/**"
       - "ec2/**"
       - ".github/workflows/terraform.yml"
+  # Apply only runs when triggered manually from the Actions tab.
+  workflow_dispatch:
 
 # Required for GitHub OIDC -> AWS role assumption
 permissions:
@@ -66,7 +68,7 @@ jobs:
   apply:
     name: Apply (${{ matrix.dir }})
     needs: terraform
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
