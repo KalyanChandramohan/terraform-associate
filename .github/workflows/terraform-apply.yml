@@ -1,0 +1,49 @@
+name: Terraform-Apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      directory:
+        description: "Which Terraform root to apply"
+        required: true
+        type: choice
+        options:
+          - ec2
+          # - user_management
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VERSION: "1.9.5"
+  AWS_REGION: "ap-south-1"
+
+jobs:
+  apply:
+    name: Apply (${{ inputs.directory }})
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4 
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }} 
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform Init
+        run: terraform init -input=false  
+
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve
+        

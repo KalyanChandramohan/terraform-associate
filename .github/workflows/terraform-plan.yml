@@ -1,4 +1,4 @@
-name: Terraform
+name: Terraform-Plan
 
 on:
   push:
@@ -65,37 +65,3 @@ jobs:
         id: plan
         run: terraform plan -input=false -no-color
 
-  apply:
-    name: Apply (${{ matrix.dir }})
-    needs: terraform
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        dir: [ec2]
-    # Optional: require manual approval by protecting this environment in repo settings
-    environment: production
-    defaults:
-      run:
-        working-directory: ${{ matrix.dir }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-
-      - name: Terraform Init
-        run: terraform init -input=false
-
-      - name: Terraform Apply
-        run: terraform apply -input=false -auto-approve
