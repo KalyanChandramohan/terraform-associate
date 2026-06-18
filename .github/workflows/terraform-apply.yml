@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - ec2
+          - vpc
           # - user_management
 
 permissions:

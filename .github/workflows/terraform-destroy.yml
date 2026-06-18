@@ -11,6 +11,7 @@ on:
         type: choice
         options:
           - ec2
+          - vpc
           # - user_management
       confirm:
         description: 'Type "destroy" to confirm'
@@ -51,7 +52,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.TF_VERSION }}
 

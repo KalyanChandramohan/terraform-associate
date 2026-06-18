@@ -6,12 +6,14 @@ on:
     paths:
       #- "user_management/**"
       - "ec2/**"
+      - "vpc/**"
       - ".github/workflows/terraform.yml"
   pull_request:
     branches: [main]
     paths:
       #- "user_management/**"
       - "ec2/**"
+      - "vpc/**"
       - ".github/workflows/terraform.yml"
   # Apply only runs when triggered manually from the Actions tab.
   workflow_dispatch:
@@ -33,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dir: [ec2]
+        dir: [ec2, vpc]
     defaults:
       run:
         working-directory: ${{ matrix.dir }}
@@ -48,7 +50,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
